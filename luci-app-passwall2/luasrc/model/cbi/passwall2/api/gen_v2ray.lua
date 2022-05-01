@@ -567,6 +567,7 @@ end
 
 if remote_dns_server or remote_dns_doh_url or remote_dns_fake then
     local rules = {}
+    local _remote_dns_proto
 
     if not routing then
         routing = {
@@ -620,11 +621,13 @@ if remote_dns_server or remote_dns_doh_url or remote_dns_fake then
         if remote_dns_udp_server then
             _remote_dns.address = remote_dns_udp_server
             _remote_dns.port = tonumber(remote_dns_port) or 53
+            _remote_dns_proto = "udp"
         end
 
         if remote_dns_tcp_server then
             _remote_dns.address = remote_dns_tcp_server
             _remote_dns.port = tonumber(remote_dns_port) or 53
+            _remote_dns_proto = "tcp"
         end
 
         if remote_dns_doh_url and remote_dns_doh_host then
@@ -633,6 +636,7 @@ if remote_dns_server or remote_dns_doh_url or remote_dns_fake then
             end
             _remote_dns.address = remote_dns_doh_url
             _remote_dns.port = tonumber(remote_dns_port) or 443
+            _remote_dns_proto = "tcp"
         end
 
         if remote_dns_fake then
@@ -674,6 +678,8 @@ if remote_dns_server or remote_dns_doh_url or remote_dns_fake then
                 ip = {
                     direct_dns_udp_server
                 },
+                port = tonumber(direct_dns_port) or 53,
+                network = "udp",
                 outboundTag = "direct"
             })
         end
@@ -712,7 +718,8 @@ if remote_dns_server or remote_dns_doh_url or remote_dns_fake then
             protocol = "dns",
             settings = {
                 address = remote_dns_server or "1.1.1.1",
-                network = "tcp"
+                port = tonumber(remote_dns_port) or 53,
+                network = _remote_dns_proto or "tcp",
             }
         })
 
